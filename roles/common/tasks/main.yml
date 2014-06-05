@@ -1,0 +1,39 @@
+- name: Install git
+  apt: name=git state=latest
+
+- name: Install htop
+  apt: name=htop state=latest
+
+- name: Install exuberant-ctags
+  apt: name=exuberant-ctags state=latest
+
+- name: Install vim
+  apt: name=vim state=latest
+
+- name: Install zsh
+  apt: name=zsh state=latest
+
+- name: Install sudo
+  apt: name=sudo state=latest
+
+- name: Create the sudo group
+  group:
+    name=sudo
+    state=present
+
+- name: Create a new user
+  user:
+    name=tyler
+    state=present
+    groups="sudo"
+    shell=/bin/zsh
+    password=$6$rounds=100000$kOPsL36LobJSBkbM$qs04KIxy/i7hxwrNnaQhz8vVF7lt1UOqydXYKIjwJ./u0diaSvdREIVrs.wmduWHCu4IOfll66d8Q.HQ2RWdC/
+
+- name: Create the environment directory.
+  file: path=/home/tyler/src state=directory
+
+- name: Check out the environment repo.
+  git:
+    repo=https://github.com/roberttstephens/environment.git
+    dest=/home/tyler/src/environment
+    update=yes

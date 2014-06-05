@@ -1,0 +1,13 @@
+- name: apply common configuration to all nodes
+  hosts: all
+  user: root
+
+  roles:
+    - common
+
+- name: apply configuration to dbservers
+  hosts: dbservers
+  user: root
+
+  roles:
+    - Ansibles.mysql
