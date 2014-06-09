@@ -49,6 +49,13 @@
     dest=/home/tyler/src/environment
     update=yes
 
+- name: Chown ~/src/environment
+  file:
+    path=/home/tyler/src/environment
+    owner=tyler
+    group=tyler
+    recurse=yes
+
 - name: Set symbolic links
   file:
     src=/home/tyler/src/environment/{{ item.src }}
