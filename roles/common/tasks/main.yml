@@ -29,11 +29,48 @@
     shell=/bin/zsh
     password=$6$rounds=100000$kOPsL36LobJSBkbM$qs04KIxy/i7hxwrNnaQhz8vVF7lt1UOqydXYKIjwJ./u0diaSvdREIVrs.wmduWHCu4IOfll66d8Q.HQ2RWdC/
 
-- name: Create the environment directory.
-  file: path=/home/tyler/src state=directory
+- name: Create home directories
+  file: path=/home/tyler/{{ item }}
+    state=directory
+    owner=tyler
+    group=tyler
+    mode=0700
+  with_items:
+    - src
+    - backups
+    - bin
+    - projects
+    - scripts
+    - tmp
 
 - name: Check out the environment repo.
   git:
     repo=https://github.com/roberttstephens/environment.git
     dest=/home/tyler/src/environment
     update=yes
+
+- name: Set symbolic links
+  file:
+    src=/home/tyler/src/environment/{{ item.src }}
+    dest=/home/tyler/{{ item.dest }}
+    state=link
+    owner=tyler
+    group=tyler
+  with_items:
+    - { src: '_aliases', dest: '.aliases'}
+    - { src: '_gitconfig', dest: '.gitconfig'}
+    - { src: '_gitignore', dest: '.gitignore'}
+    - { src: '_gvimrc', dest: '.gvimrc'}
+    - { src: '_vim', dest: '.vim'}
+    - { src: '_vimrc', dest: '.vimrc'}
+    - { src: '_shrc', dest: '.shrc'}
+    - { src: 'shared_bin', dest: 'shared_bin'}
+
+
+- name: Source shared shrc file.
+  lineinfile:
+    dest=/home/tyler/{{ item }}
+    line="if [ -f ~/.shrc ]; then source ~/.shrc; fi"
+  with_items:
+    - .bashrc
+    - .zshrc
