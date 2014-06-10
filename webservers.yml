@@ -2,17 +2,22 @@
   hosts: webservers
   user: root
   vars:
-    php_fpm_pools:
-    - name: food
-      user: www-data
-      group: www-data
-      listen: /var/run/php5-fpm.sock
-      pm: dynamic
-      pm.max_children: 10
-      pm.start_servers: 2
-      pm.min_spare_servers: 2
-      pm.max_spare_servers: 6
-      chdir: /
+    fpm_pools:
+    - pool:
+        name: foo
+        vars:
+          - user = www-data
+          - group = www-data
+          - listen = /var/run/php5-fpm.sock
+          - pm = dynamic
+          - pm.max_children = 10
+          - pm.start_servers = 2
+          - pm.min_spare_servers = 2
+          - pm.max_spare_servers = 6
+          - chdir = /
+          - listen.owner = www-data
+          - listen.group = www-data
+          - listen.mode = 0600
 
     php_config:
     - option: "error_reporting"
@@ -31,6 +36,27 @@
      - php5-mysql
      - php5-mcrypt
      - php5-memcache
+    nginx_user: "www-data"
+    nginx_sites:
+      drupal7:
+        - listen 80
+        - server_name vm-www.*
+        - root "/var/www/drupal7"
+        - index index.php index.html
+        - location / { try_files $uri @rewrite; }
+        - location @rewrite { rewrite ^ /index.php; }
+        - location ~ \.php$ {
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+            fastcgi_intercept_errors on;
+            fastcgi_pass unix:/var/run/php5-fpm.sock;
+            fastcgi_index index.php;
+            fastcgi_read_timeout 380;
+            include fastcgi_params;
+          }
+        - location ~ ^/sites/.*/files/styles/ { try_files $uri @rewrite; }
+        - location ~ /\.ht { deny all; }
 
   roles:
     - nbz4live.php-fpm
+    - jdauphant.nginx
