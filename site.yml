@@ -1,1 +1,8 @@
+- name: Apply common configurations to all hosts.
+  hosts: all
+  user: root
+  roles:
+   - common
+
 - include: dbservers.yml
+- include: webservers.yml

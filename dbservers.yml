@@ -3,5 +3,4 @@
   user: root
 
   roles:
-    - common
     - Ansibles.mysql

@@ -1,0 +1,36 @@
+- name: apply configuration to webservers
+  hosts: webservers
+  user: root
+  vars:
+    php_fpm_pools:
+    - name: food
+      user: www-data
+      group: www-data
+      listen: /var/run/php5-fpm.sock
+      pm: dynamic
+      pm.max_children: 10
+      pm.start_servers: 2
+      pm.min_spare_servers: 2
+      pm.max_spare_servers: 6
+      chdir: /
+
+    php_config:
+    - option: "error_reporting"
+      section: "PHP"
+      value: "E_ALL"
+    - option: "display_errors"
+      section: "PHP"
+      value: "On"
+    - option: "display_startup_errors"
+      section: "PHP"
+      value: "On"
+    apt_packages:
+     - php5-fpm
+     - php5-curl
+     - php5-gd
+     - php5-mysql
+     - php5-mcrypt
+     - php5-memcache
+
+  roles:
+    - nbz4live.php-fpm
