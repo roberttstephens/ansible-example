@@ -1,0 +1,7 @@
+- name: apply configuration to dbservers
+  hosts: dbservers
+  user: root
+
+  roles:
+    - common
+    - Ansibles.mysql
